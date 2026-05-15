@@ -1,0 +1,934 @@
+<Window x:Class="MHC.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MHC"
+        mc:Ignorable="d"
+        Title="碰撞电源模块监控系统" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+        <local:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <local:StatusToStringConverter x:Key="StatusToStringConverter"/>
+        <local:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
+        <local:CurrentToBrushConverter x:Key="CurrentToBrushConverter"/>
+        <local:MochainStatusConverter x:Key="MochainStatusConverter"/>
+        <local:MochainStatusBrushConverter x:Key="MochainStatusBrushConverter"/>
+        <local:InternalStatusConverter x:Key="InternalStatusConverter"/>
+        <local:InternalStatusBrushConverter x:Key="InternalStatusBrushConverter"/>
+    </Window.Resources>
+    <Grid>
+        <TabControl x:Name="MainTabControl" Margin="10">
+            <TabItem Header="监控区">
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="监控区" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+
+                    <!-- 第一行：电容监控和SRS碰撞CAN信号监控 -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 电容监控 -->
+                        <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="电容监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+
+                                <!-- 电容单体监控 -->
+                                <TextBlock Text="电容单体监控" FontSize="12" FontWeight="Bold" Margin="0,0,0,3"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- 表头 -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="单体" FontWeight="Bold" Margin="0,0,5,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="电压(mV)" FontWeight="Bold" Margin="0,0,5,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="过压" FontWeight="Bold" Margin="0,0,5,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="3" Text="短路" FontWeight="Bold" Margin="0,0,5,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="4" Text="均衡" FontWeight="Bold" Margin="0,0,5,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="5" Text="均衡次数" FontWeight="Bold" Margin="0,0,0,2"/>
+
+                                    <!-- Cell 1 -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Cell1:" Margin="0,2,5,0"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_Cell1Vol]}" x:Name="Cell1Voltage" Margin="0,2,5,0"/>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell1OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell1OverVoltageEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell1OverVoltageState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell1OverVoltageStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell1OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell1ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell1ShortCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell1ShortCircuitState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell1ShortCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell1ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="4" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell1BlanceState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell1BalanceEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell1BlanceState], Converter={StaticResource BoolToStringConverter}, ConverterParameter=balance}" x:Name="Cell1BalanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell1BlanceState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="1" Grid.Column="5" Text="{Binding SignalValues[SuperCapController_Cap_Cell1BlanceCount]}" x:Name="Cell1BalanceCount" Margin="0,2,0,0" FontSize="10"/>
+
+                                    <!-- Cell 2 -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Cell2:" Margin="0,2,5,0"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_Cell2Vol]}" x:Name="Cell2Voltage" Margin="0,2,5,0"/>
+                                    <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell2OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell2OverVoltageEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell2OverVoltageState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell2OverVoltageStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell2OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell2ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell2ShortCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell2ShortCircuitState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell2ShortCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell2ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="4" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell2BlanceState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell2BalanceEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell2BlanceState], Converter={StaticResource BoolToStringConverter}, ConverterParameter=balance}" x:Name="Cell2BalanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell2BlanceState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding SignalValues[SuperCapController_Cap_Cell2BlanceCount]}" x:Name="Cell2BalanceCount" Margin="0,2,0,0" FontSize="10"/>
+
+                                    <!-- Cell 3 -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Cell3:" Margin="0,2,5,0"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_Cell3Vol]}" x:Name="Cell3Voltage" Margin="0,2,5,0"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell3OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell3OverVoltageEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell3OverVoltageState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell3OverVoltageStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell3OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell3ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell3ShortCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell3ShortCircuitState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell3ShortCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell3ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell3BlanceState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell3BalanceEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell3BlanceState], Converter={StaticResource BoolToStringConverter}, ConverterParameter=balance}" x:Name="Cell3BalanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell3BlanceState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="3" Grid.Column="5" Text="{Binding SignalValues[SuperCapController_Cap_Cell3BlanceCount]}" x:Name="Cell3BalanceCount" Margin="0,2,0,0" FontSize="10"/>
+
+                                    <!-- Cell 4 -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Cell4:" Margin="0,2,5,0"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_Cell4Vol]}" x:Name="Cell4Voltage" Margin="0,2,5,0"/>
+                                    <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell4OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell4OverVoltageEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell4OverVoltageState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell4OverVoltageStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell4OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="3" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell4ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell4ShortCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell4ShortCircuitState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell4ShortCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell4ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="4" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell4BlanceState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell4BalanceEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell4BlanceState], Converter={StaticResource BoolToStringConverter}, ConverterParameter=balance}" x:Name="Cell4BalanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell4BlanceState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="4" Grid.Column="5" Text="{Binding SignalValues[SuperCapController_Cap_Cell4BlanceCount]}" x:Name="Cell4BalanceCount" Margin="0,2,0,0" FontSize="10"/>
+
+                                    <!-- Cell 5 -->
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Cell5:" Margin="0,2,5,0"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_Cell5Vol]}" x:Name="Cell5Voltage" Margin="0,2,5,0"/>
+                                    <StackPanel Grid.Row="5" Grid.Column="2" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell5OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell5OverVoltageEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell5OverVoltageState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell5OverVoltageStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell5OverVoltageState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="5" Grid.Column="3" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell5ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell5ShortCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell5ShortCircuitState], Converter={StaticResource BoolToStringConverter}}" x:Name="Cell5ShortCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell5ShortCircuitState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="5" Grid.Column="4" Orientation="Horizontal" Margin="0,2,5,0">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_Cell5BlanceState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,2,0" x:Name="Cell5BalanceEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_Cell5BlanceState], Converter={StaticResource BoolToStringConverter}, ConverterParameter=balance}" x:Name="Cell5BalanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_Cell5BlanceState], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="5" Grid.Column="5" Text="{Binding SignalValues[SuperCapController_Cap_Cell5BlanceCount]}" x:Name="Cell5BalanceCount" Margin="0,2,0,0" FontSize="10"/>
+                                </Grid>
+
+                                <!-- 电容模组综合监控 -->
+                                <TextBlock Text="电容模组综合监控" FontSize="12" FontWeight="Bold" Margin="0,0,0,3"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="模组电量:"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_ModulePower], StringFormat={}{0}%}" x:Name="ModuleSOC"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="模组电压:"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_ModuleVoltage], StringFormat={}{0}mV}" x:Name="ModuleVoltage"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="模组电流:"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_ModuleCurrent], StringFormat={}{0}mA}" x:Name="ModuleCurrent"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="放电平均电流:"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_DisChargeCurrent], StringFormat={}{0}mA}" x:Name="ModuleDischargeAvgCurrent"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="充放电状态:"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_MochainStatus], Converter={StaticResource MochainStatusConverter}}" x:Name="ModuleStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_MochainStatus], Converter={StaticResource MochainStatusBrushConverter}}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- SRS碰撞CAN信号监控 -->
+                        <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="SRS碰撞CAN信号监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="碰撞信号:"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="无" x:Name="CrashSignal" Foreground="Gray"/>
+                                  </Grid>
+
+                                <TextBlock Text="模组告警监控" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- 温度和过温状态 -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="温度:"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_ModuleTempreture], StringFormat={}{0}°C}" x:Name="Temperature"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="过温:"/>
+                                    <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_OverTempretureState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="OverTempEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_OverTempretureState], Converter={StaticResource BoolToStringConverter}}" x:Name="OverTempStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_OverTempretureState], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- 容值和容值状态 -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="容值:"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_ModuleCapacity], StringFormat={}{0:N1}F}" x:Name="ModuleCapacity"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="容值状态:"/>
+                                    <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_ModuleCapacityState], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="CapacityStatusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_ModuleCapacityState], Converter={StaticResource BoolToStringConverter}}" x:Name="CapacityStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_ModuleCapacityState], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- 内阻和内阻状态 -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="内阻:"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_InternalResistance], StringFormat={}{0}mΩ}" x:Name="InternalResistance"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="内阻状态:"/>
+                                    <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_InternalResistanceStatus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="ResistanceStatusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_InternalResistanceStatus], Converter={StaticResource BoolToStringConverter}}" x:Name="ResistanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_InternalResistanceStatus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- 断路状态 -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="断路状态:"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_OpenCircuitFault], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="ModuleOpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_OpenCircuitFault], Converter={StaticResource BoolToStringConverter}}" x:Name="ModuleOpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_OpenCircuitFault], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- 不均衡故障 -->
+                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="不均衡:"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_ImbalanceFault], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="ImbalanceEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_ImbalanceFault], Converter={StaticResource BoolToStringConverter}}" x:Name="ImbalanceStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_ImbalanceFault], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- 充电和放电故障 -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="充电故障:"/>
+                                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_ChargeFault], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="ChargeFaultEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_ChargeFault], Converter={StaticResource BoolToStringConverter}}" x:Name="ChargeFaultStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_ChargeFault], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="4" Grid.Column="2" Text="放电故障:"/>
+                                    <StackPanel Grid.Row="4" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_DisChargeFault], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="DischargeFaultEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_DisChargeFault], Converter={StaticResource BoolToStringConverter}}" x:Name="DischargeFaultStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_DisChargeFault], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- 唤醒源监控 -->
+                                <TextBlock Text="唤醒源监控" FontSize="14" FontWeight="Bold" Margin="0,5,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="CAN唤醒:"/>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="Gray" Margin="0,0,3,0" x:Name="CanWakeupEllipse"/>
+                                        <TextBlock Text="无" x:Name="CanWakeupStatus" Foreground="Gray" FontSize="12"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="KL15唤醒:"/>
+                                    <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="Gray" Margin="0,0,3,0" x:Name="KL15WakeupEllipse"/>
+                                        <TextBlock Text="无" x:Name="KL15WakeupStatus" Foreground="Gray" FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- 第二行：I/O监控 -->
+                    <Grid Grid.Row="2" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 电源监控 -->
+                        <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="电源监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- KL30电压和故障状态 -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="KL30电压:"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_KL30Voltage], StringFormat={}{0}mV}" x:Name="KL30Voltage"/>
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_KL30FaultStatus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="KL30FaultEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_KL30FaultStatus], Converter={StaticResource BoolToStringConverter}}" x:Name="KL30Status" Foreground="{Binding SignalValues[SuperCapController_Cap_KL30FaultStatus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- KL15电压和故障状态 -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="KL15电压:"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_KL15Voltage], StringFormat={}{0}mV}" x:Name="KL15Voltage"/>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_KL15FaultStatus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="KL15FaultEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_KL15FaultStatus], Converter={StaticResource BoolToStringConverter}}" x:Name="KL15Status" Foreground="{Binding SignalValues[SuperCapController_Cap_KL15FaultStatus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ARM碰撞信号监控 -->
+                        <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="ARM碰撞信号监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- PWM占空比 -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="PWM占空比:"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SignalValues[SuperCapController_Cap_CollisionSignalDuty], StringFormat={}{0}%}" x:Name="PWMDuty"/>
+
+                                    <!-- PWM状态 -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="PWM状态:"/>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Cap_CollisionSignalStatus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="PWMStatusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Cap_CollisionSignalStatus], Converter={StaticResource BoolToStringConverter}}" x:Name="PWMStatus" Foreground="{Binding SignalValues[SuperCapController_Cap_CollisionSignalStatus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- 第三行：Vds/Vgs保护监控、驱动监控、电机故障状态和内部错误状态 -->
+                    <Grid Grid.Row="3" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Vds/Vgs保护监控和驱动监控 -->
+                        <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,0,5,0">
+                            <StackPanel>
+                                <TextBlock Text="驱动通道保护监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="LFCenterM+"/>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsLFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsLFCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsLFCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsLFCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsLFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsLFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsLFCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsLFCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsLFCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsLFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="LRCenterM+"/>
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsLRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsLRCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsLRCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsLRCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsLRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsLRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsLRCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsLRCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsLRCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsLRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="LFCenterM-"/>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsLFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsLFCenterMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsLFCenterMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsLFCenterMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsLFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsLFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsLFCenterMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsLFCenterMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsLFCenterMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsLFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="LRMMinus"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsLRMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsLRMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsLRMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsLRMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsLRMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsLRMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsLRMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsLRMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsLRMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsLRMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="LRChildM+"/>
+                                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsLRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsLRChildMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsLRChildMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsLRChildMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsLRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsLRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsLRChildMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsLRChildMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsLRChildMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsLRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="RFCenterM-"/>
+                                    <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsRFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsRFCenterMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsRFCenterMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsRFCenterMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsRFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="5" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsRFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsRFCenterMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsRFCenterMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsRFCenterMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsRFCenterMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="RFCenterM+"/>
+                                    <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsRFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsRFCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsRFCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsRFCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsRFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="6" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsRFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsRFCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsRFCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsRFCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsRFCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="RRMMinus"/>
+                                    <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsRRMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsRRMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsRRMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsRRMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsRRMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="7" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsRRMMinus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsRRMMinusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsRRMMinus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsRRMMinusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsRRMMinus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="RRCenterM+"/>
+                                    <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsRRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsRRCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsRRCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsRRCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsRRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="8" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsRRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsRRCenterMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsRRCenterMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsRRCenterMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsRRCenterMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="9" Grid.Column="0" Text="RRChildM+"/>
+                                    <StackPanel Grid.Row="9" Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="VDS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VdsRRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VdsRRChildMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VdsRRChildMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VdsRRChildMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VdsRRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="9" Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock Text="VGS:" Margin="0,0,5,0"/>
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_VgsRRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="VgsRRChildMPlusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_VgsRRChildMPlus], Converter={StaticResource BoolToStringConverter}}" x:Name="VgsRRChildMPlusStatus" Foreground="{Binding SignalValues[SuperCapController_VgsRRChildMPlus], Converter={StaticResource BoolToBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 电机故障状态和内部错误状态 -->
+                        <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="电机监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.5*"/>
+                                        <ColumnDefinition Width="0.5*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- 表头 -->
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="短电源" FontWeight="Bold" FontSize="12"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="短地" FontWeight="Bold" FontSize="12"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="3" Text="开路" FontWeight="Bold" FontSize="12"/>
+                                    
+                                    <!-- 调整电机行索引 -->
+
+                                    <!-- 电机1 -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="LF前门电机:"/>
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor1ShortPower], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor1ShortPowerEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor1ShortPower], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor1ShortPowerStatus" Foreground="{Binding SignalValues[SuperCapController_Motor1ShortPower], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor1ShortGround], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor1ShortGroundEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor1ShortGround], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor1ShortGroundStatus" Foreground="{Binding SignalValues[SuperCapController_Motor1ShortGround], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor1OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor1OpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor1OpenCircuit], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor1OpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Motor1OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+
+                                    <!-- 电机2 -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="RF前门电机:"/>
+                                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor2ShortPower], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor2ShortPowerEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor2ShortPower], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor2ShortPowerStatus" Foreground="{Binding SignalValues[SuperCapController_Motor2ShortPower], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor2ShortGround], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor2ShortGroundEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor2ShortGround], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor2ShortGroundStatus" Foreground="{Binding SignalValues[SuperCapController_Motor2ShortGround], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor2OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor2OpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor2OpenCircuit], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor2OpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Motor2OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+
+                                    <!-- 电机3 -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="LR后门电机:"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor3ShortPower], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor3ShortPowerEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor3ShortPower], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor3ShortPowerStatus" Foreground="{Binding SignalValues[SuperCapController_Motor3ShortPower], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor3ShortGround], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor3ShortGroundEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor3ShortGround], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor3ShortGroundStatus" Foreground="{Binding SignalValues[SuperCapController_Motor3ShortGround], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor3OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor3OpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor3OpenCircuit], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor3OpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Motor3OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+
+                                    <!-- 电机4 -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="RR后门电机:"/>
+                                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor4ShortPower], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor4ShortPowerEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor4ShortPower], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor4ShortPowerStatus" Foreground="{Binding SignalValues[SuperCapController_Motor4ShortPower], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor4ShortGround], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor4ShortGroundEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor4ShortGround], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor4ShortGroundStatus" Foreground="{Binding SignalValues[SuperCapController_Motor4ShortGround], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="4" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor4OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor4OpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor4OpenCircuit], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor4OpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Motor4OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+
+                                    <!-- 电机5 -->
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="LR儿童锁电机:"/>
+                                    <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor5ShortPower], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor5ShortPowerEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor5ShortPower], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor5ShortPowerStatus" Foreground="{Binding SignalValues[SuperCapController_Motor5ShortPower], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="5" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor5ShortGround], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor5ShortGroundEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor5ShortGround], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor5ShortGroundStatus" Foreground="{Binding SignalValues[SuperCapController_Motor5ShortGround], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="5" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor5OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor5OpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor5OpenCircuit], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor5OpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Motor5OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+
+                                    <!-- 电机6 -->
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="RR儿童锁电机:"/>
+                                    <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor6ShortPower], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor6ShortPowerEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor6ShortPower], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor6ShortPowerStatus" Foreground="{Binding SignalValues[SuperCapController_Motor6ShortPower], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="6" Grid.Column="2" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor6ShortGround], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor6ShortGroundEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor6ShortGround], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor6ShortGroundStatus" Foreground="{Binding SignalValues[SuperCapController_Motor6ShortGround], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="6" Grid.Column="3" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_Motor6OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" Margin="0,0,3,0" x:Name="Motor6OpenCircuitEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_Motor6OpenCircuit], Converter={StaticResource BoolToStringConverter}}" x:Name="Motor6OpenCircuitStatus" Foreground="{Binding SignalValues[SuperCapController_Motor6OpenCircuit], Converter={StaticResource BoolToBrushConverter}}" FontSize="10"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="内部监控" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding SignalValues[SuperCapController_InternalStatus], Converter={StaticResource InternalStatusBrushConverter}}" Margin="0,0,3,0" x:Name="InternalStatusEllipse"/>
+                                        <TextBlock Text="{Binding SignalValues[SuperCapController_InternalStatus], Converter={StaticResource InternalStatusConverter}}" x:Name="InternalStatusText" Foreground="{Binding SignalValues[SuperCapController_InternalStatus], Converter={StaticResource InternalStatusBrushConverter}}" FontSize="12"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- 第四行：CAN帧计数 -->
+                    <Grid Grid.Row="4" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Grid.Column="0">
+                            <StackPanel>
+                                <TextBlock Text="发送帧" FontSize="12"/>
+                                <TextBlock x:Name="SentFrameCountText" Text="0" FontSize="16" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Grid.Column="1" Margin="10,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="接收帧" FontSize="12"/>
+                                <TextBlock x:Name="ReceivedFrameCountText" Text="0" FontSize="16" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10" Grid.Column="2">
+                            <StackPanel>
+                                <TextBlock Text="错误帧" FontSize="12"/>
+                                <TextBlock x:Name="ErrorFrameCountText" Text="0" FontSize="16" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="控制区">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="控制区" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                    <!-- 功能控制 -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 点控功能 -->
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="点控功能" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="130"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="50"/>
+                                            <RowDefinition Height="50"/>
+                                            <RowDefinition Height="50"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Button Grid.Row="0" Grid.Column="0" Content="左前门锁解锁" x:Name="FrontLeftLockUnlockButton" Margin="0,0,10,5" Width="120" Height="40" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="0" Grid.Column="1" Content="右前门锁解锁" x:Name="FrontRightLockUnlockButton" Margin="0,0,0,5" Width="120" Height="40" HorizontalAlignment="Left"/>
+
+                                        <Button Grid.Row="1" Grid.Column="0" Content="左后门锁解锁" x:Name="RearLeftLockUnlockButton" Margin="0,5,10,5" Width="120" Height="40" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="1" Grid.Column="1" Content="右后门锁解锁" x:Name="RearRightLockUnlockButton" Margin="0,5,0,5" Width="120" Height="40" HorizontalAlignment="Left"/>
+
+                                        <Button Grid.Row="2" Grid.Column="0" Content="左后门儿童锁" x:Name="RearLeftChildLockButton" Margin="0,5,10,0" Width="120" Height="40" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="2" Grid.Column="1" Content="右后门儿童锁" x:Name="RearRightChildLockButton" Margin="0,5,0,0" Width="120" Height="40" HorizontalAlignment="Left"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 充放电控制 -->
+                        <StackPanel Grid.Column="1">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="充放电控制" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="130"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="45"/>
+                                            <RowDefinition Height="45"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Button Grid.Row="0" Grid.Column="0" Content="充电" x:Name="ChargeButton" Margin="0,0,5,0" Width="120" Height="40" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="0" Grid.Column="1" Content="放电" x:Name="DischargeButton" Margin="0,0,0,0" Width="120" Height="40" HorizontalAlignment="Left"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 自动化控制和参数设置 -->
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 自动化控制 -->
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="5">
+                                <StackPanel>
+                                    <TextBlock Text="自动化控制" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="40"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Button Grid.Row="0" Grid.Column="0" Content="DV环境工况" x:Name="DVTestButton" Margin="0,0,5,0" Width="140" Height="35" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="停止" x:Name="DVTestStatus" Margin="0,8,0,0" HorizontalAlignment="Left"/>
+
+                                        <Button Grid.Row="1" Grid.Column="0" Content="DV热测试工况" x:Name="HeatTestButton" Margin="0,0,5,0" Width="140" Height="35" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="停止" x:Name="HeatTestStatus" Margin="0,8,0,0" HorizontalAlignment="Left"/>
+
+                                        <Button Grid.Row="2" Grid.Column="0" Content="EMC试验工况" x:Name="EMCTestButton" Margin="0,0,5,0" Width="140" Height="35" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="停止" x:Name="EMCTestStatus"  Margin="0,8,0,0" HorizontalAlignment="Left"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 参数设置 -->
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="5">
+                                <StackPanel>
+                                    <TextBlock Text="参数设置" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="70"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="已循环次数:" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="0" x:Name="CurrentCycleCount" VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="设置循环次数:" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="100" x:Name="TotalCycleCount" Margin="0,0,3,0" VerticalAlignment="Center" Width="50" HorizontalAlignment="Left"/>
+                                        <Button Grid.Row="1" Grid.Column="2" Content="设置" x:Name="SetCycleCountButton" Width="60" Height="20" HorizontalAlignment="Left"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="循环间隔时间:" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBox Text="1000" x:Name="CycleIntervalTime" Margin="0,0,3,0" Width="50" HorizontalAlignment="Left"/>
+                                            <TextBlock Text="ms" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <Button Grid.Row="2" Grid.Column="2" Content="设置" x:Name="SetIntervalButton" Width="60" Height="20" HorizontalAlignment="Left"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 休眠唤醒控制 -->
+                    <Grid Grid.Row="3" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 休眠唤醒控制 -->
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="休眠唤醒控制" FontSize="14" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="当前状态: 唤醒" x:Name="SleepWakeStatus" FontSize="20" FontWeight="Bold" Foreground="Green" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="35"/>
+                                            <RowDefinition Height="35"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Button Grid.Row="0" Grid.Column="0" Content="进入休眠" x:Name="EnterSleepButton" Margin="0,0,5,0" Width="90" Height="30" HorizontalAlignment="Right"/>
+                                        <Button Grid.Row="0" Grid.Column="1" Content="退出休眠" x:Name="ExitSleepButton" Margin="0,0,0,0" Width="90" Height="30" HorizontalAlignment="Left"/>
+                                        <Button Grid.Row="1" Grid.Column="0" Content="CAN唤醒" x:Name="CanWakeupButton" Margin="0,5,5,0" Width="90" Height="30" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 版本号读取 -->
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="版本号读取" FontSize="14" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                                    <Button Content="读取版本号" x:Name="ReadVersionButton" Margin="0,0,0,10" Width="150" Height="35" HorizontalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="25"/>
+                                            <RowDefinition Height="25"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="软件版本:" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="V1.0.0" x:Name="SoftwareVersion" VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="硬件版本:" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="V2.0.0" x:Name="HardwareVersion" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="故障监控">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="故障监控" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+
+
+                    <!-- 故障码读取 -->
+                    <Grid Grid.Row="1" Margin="0,10,0,0">
+                        <StackPanel>
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="故障码读取 (UDS协议)" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    <Button Content="读取故障码" x:Name="ReadFaultCodesButton" Margin="0,0,0,10" Width="120" Height="40"/>
+                                    <ListBox x:Name="FaultCodesList" Height="150">
+                                        <ListBoxItem>无故障码</ListBoxItem>
+                                    </ListBox>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>

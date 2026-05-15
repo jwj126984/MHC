@@ -1,0 +1,314 @@
+//*******************************************************
+//  * Name    :CPM_Tester.dbc
+//  * Author  :MatrixCreat @WangHu
+//  * Function:****
+//  * Version :V1.0.0
+//  * Data    :2026.04.10 18:05:56
+//*******************************************************
+
+VERSION "WangHu V1.0"
+
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Tester CPM
+
+BO_ 1537 SuperCapTester: 64 Tester
+ SG_ Cap_TestChargeCmd : 14|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestCycleSeeting : 39|16@0+ (1,0) [0|65535] "" CPM
+ SG_ Cap_TestSleepCmd : 15|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_DishargeToChargeDalay : 23|16@0+ (1,0) [0|65535] "5ms" CPM
+ SG_ Cap_TestOperatingConditions : 10|3@0+ (1,0) [0|7] "" CPM
+ SG_ Cap_TestDischargeCmd : 13|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestDoorRRChild : 2|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestDoorLRChild : 3|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestDoorRRCmd : 4|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestDoorLRCmd : 5|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestDoorRFCmd : 6|1@0+ (1,0) [0|1] "" CPM
+ SG_ Cap_TestDoorLFCmd : 7|1@0+ (1,0) [0|1] "" CPM
+
+BO_ 1536 SuperCapController: 64 CPM
+ SG_ Cap_Cell5BlanceCount : 391|12@0+ (1,0) [0|4095] "" Tester
+ SG_ Cap_Cell4BlanceCount : 375|12@0+ (1,0) [0|4095] "" Tester
+ SG_ Cap_Cell3BlanceCount : 359|12@0+ (1,0) [0|4095] "" Tester
+ SG_ Cap_Cell2BlanceCount : 343|12@0+ (1,0) [0|4095] "" Tester
+ SG_ Cap_Cell1BlanceCount : 327|12@0+ (1,0) [0|4095] "" Tester
+ SG_ Cap_Cell5BlanceState : 395|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell4BlanceState : 379|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell3BlanceState : 363|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell2BlanceState : 347|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell1BlanceState : 331|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_ModuleCapacityState : 303|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_CycleTestReport : 311|16@0+ (1,0) [0|65535] "" Tester
+ SG_ Cap_SleepStatus : 299|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_EMCStatus : 300|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DVHotStatus : 301|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DVNormalStatus : 302|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DirverMotorLRChildFault : 447|8@0+ (1,0) [0|255] "" Tester
+ SG_ Cap_DirverMotorRRChildFault : 455|8@0+ (1,0) [0|255] "" Tester
+ SG_ Cap_DirverInternalFault : 279|16@0+ (1,0) [0|65535] "" Tester
+ SG_ Cap_DirverMotorRRFault : 431|8@0+ (1,0) [0|255] "" Tester
+ SG_ Cap_DirverMotorLRFault : 415|8@0+ (1,0) [0|255] "" Tester
+ SG_ Cap_DirverMotorRFFault : 439|8@0+ (1,0) [0|255] "" Tester
+ SG_ Cap_DirverMotorLFFault : 423|8@0+ (1,0) [0|255] "" Tester
+ SG_ Cap_DriverVdsRRChildMPlus : 264|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsRRMMinus : 265|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsRRChildMPlus : 266|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsRRCenterMPlus : 267|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsRFCenterMPlus : 268|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsRFCenterMMinus : 269|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsLRMMinus : 270|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsLRCenterMPlus : 271|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsLRChildMPlus : 256|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsLFCenterMPlus : 257|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVgsLFCenterMMinus : 258|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsRRCenterMPlus : 259|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsRRMMinus : 260|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsRFCenterMPlus : 261|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsRFCenterMMinus : 262|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsLRChildMPlus : 263|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsLRMMinus : 240|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsLFCenterMMinus : 241|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsLRCenterMPlus : 168|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DriverVdsLFCenterMPlus : 169|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_CollisionSignalStatus : 244|3@0+ (1,0) [0|7] "" Tester
+ SG_ Cap_CollisionSignalDuty : 255|8@0+ (1,0) [0|255] "%" Tester
+ SG_ Cap_KL15FaultStatus : 247|3@0+ (1,0) [0|7] "" Tester
+ SG_ Cap_KL15Voltage : 231|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_KL30FaultStatus : 90|3@0+ (1,0) [0|7] "" Tester
+ SG_ Cap_KL30Voltage : 215|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_ChargeFault : 174|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_ChargeVoltage : 199|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_DisChargeFault : 175|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_DisChargeCurrent : 183|16@0- (1,0) [-32768|32767] "mA" Tester
+ SG_ Cap_ImbalanceFault : 170|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_OpenCircuitFault : 173|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_InternalResistance : 159|16@0+ (1,0) [0|65535] "mΩ" Tester
+ SG_ Cap_InternalResistanceStatus : 172|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_ModuleCapacity : 151|8@0+ (0.1,0) [0|25.5] "F" Tester
+ SG_ Cap_OverTempretureState : 171|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_ModuleTempreture : 143|8@0- (1,0) [-128|127] "℃" Tester
+ SG_ Cap_MochainStatus : 82|3@0+ (1,0) [0|7] "" Tester
+ SG_ Cap_ModuleCurrent : 127|16@0- (1,0) [-32768|32767] "mA" Tester
+ SG_ Cap_ModuleVoltage : 111|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_ModulePower : 103|8@0+ (1,0) [0|255] "%" Tester
+ SG_ Cap_Cell5ShortCircuitState : 91|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell4ShortCircuitState : 92|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell3ShortCircuitState : 93|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell2ShortCircuitState : 94|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell1ShortCircuitState : 95|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell5OverVoltageState : 83|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell4OverVoltageState : 84|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell3OverVoltageState : 85|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell2OverVoltageState : 86|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell1OverVoltageState : 87|1@0+ (1,0) [0|1] "" Tester
+ SG_ Cap_Cell5Vol : 71|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_Cell4Vol : 55|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_Cell3Vol : 39|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_Cell2Vol : 23|16@0+ (1,0) [0|65535] "mV" Tester
+ SG_ Cap_Cell1Vol : 7|16@0+ (1,0) [0|65535] "mV" Tester
+
+
+CM_ SG_ 1537 Cap_TestChargeCmd "充放电控制模块，充电一键执行按键";
+CM_ SG_ 1537 Cap_TestCycleSeeting "自动化控制模块，循环次数设置";
+CM_ SG_ 1537 Cap_TestSleepCmd "功能控制模块，休眠控制";
+CM_ SG_ 1537 Cap_DishargeToChargeDalay "自动化控制模块，放电结束到下次充电时间间隔设置";
+CM_ SG_ 1537 Cap_TestOperatingConditions "自动化控制模块，测试工况一键执行按键，DV热测试-1；DV热测试工况-2；EMC试验工况-3";
+CM_ SG_ 1537 Cap_TestDischargeCmd "充放电控制模块，放电一键执行按键";
+CM_ SG_ 1537 Cap_TestDoorRRChild "点控模块，右后儿童锁锁解锁一键执行按键";
+CM_ SG_ 1537 Cap_TestDoorLRChild "点控模块，左后儿童锁解锁一键执行按键";
+CM_ SG_ 1537 Cap_TestDoorRRCmd "点控模块，右后门锁解锁一键执行按键";
+CM_ SG_ 1537 Cap_TestDoorLRCmd "点控模块，左后门锁解锁一键执行按键";
+CM_ SG_ 1537 Cap_TestDoorRFCmd "点控模块，右前门锁解锁一键执行按键";
+CM_ SG_ 1537 Cap_TestDoorLFCmd "点控模块，左前门锁解锁一键执行按键";
+CM_ SG_ 1536 Cap_Cell5BlanceCount "模组告警故障模块，电容均衡次数";
+CM_ SG_ 1536 Cap_Cell4BlanceCount "模组告警故障模块，电容均衡次数";
+CM_ SG_ 1536 Cap_Cell3BlanceCount "模组告警故障模块，电容均衡次数";
+CM_ SG_ 1536 Cap_Cell2BlanceCount "模组告警故障模块，电容均衡次数";
+CM_ SG_ 1536 Cap_Cell1BlanceCount "模组告警故障模块，电容均衡次数";
+CM_ SG_ 1536 Cap_Cell5BlanceState "模组告警故障模块，电容均衡状态";
+CM_ SG_ 1536 Cap_Cell4BlanceState "模组告警故障模块，电容均衡状态";
+CM_ SG_ 1536 Cap_Cell3BlanceState "模组告警故障模块，电容均衡状态";
+CM_ SG_ 1536 Cap_Cell2BlanceState "模组告警故障模块，电容均衡状态";
+CM_ SG_ 1536 Cap_Cell1BlanceState "模组告警故障模块，电容均衡状态";
+CM_ SG_ 1536 Cap_ModuleCapacityState "模组告警故障模块，模组容值异常显示";
+CM_ SG_ 1536 Cap_CycleTestReport "自动化控制模块，循环次数计数";
+CM_ SG_ 1536 Cap_SleepStatus "功能控制模块，休眠状态显示";
+CM_ SG_ 1536 Cap_EMCStatus "自动化控制模块，EMC试验工况状态显示";
+CM_ SG_ 1536 Cap_DVHotStatus "自动化控制模块，DV热试验工况状态显示";
+CM_ SG_ 1536 Cap_DVNormalStatus "自动化控制模块，DV试验工况状态显示";
+CM_ SG_ 1536 Cap_DirverMotorLRChildFault "电机监控，左后儿童锁电机故障状态";
+CM_ SG_ 1536 Cap_DirverMotorRRChildFault "电机监控，右后儿童锁电机故障状态";
+CM_ SG_ 1536 Cap_DirverInternalFault "内部监控，内部错误状态";
+CM_ SG_ 1536 Cap_DirverMotorRRFault "电机监控，右后中控锁电机故障状态";
+CM_ SG_ 1536 Cap_DirverMotorLRFault "电机监控，左后中控锁电机故障状态";
+CM_ SG_ 1536 Cap_DirverMotorRFFault "电机监控，右前中控锁电机故障状态";
+CM_ SG_ 1536 Cap_DirverMotorLFFault "电机监控，左前中控锁电机故障状态";
+CM_ SG_ 1536 Cap_DriverVdsRRChildMPlus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVgsRRMMinus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsRRChildMPlus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsRRCenterMPlus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsRFCenterMPlus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsRFCenterMMinus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsLRMMinus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsLRCenterMPlus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsLRChildMPlus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsLFCenterMPlus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVgsLFCenterMMinus "I/O监控模块，VGS保护";
+CM_ SG_ 1536 Cap_DriverVdsRRCenterMPlus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsRRMMinus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsRFCenterMPlus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsRFCenterMMinus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsLRChildMPlus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsLRMMinus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsLFCenterMMinus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsLRCenterMPlus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_DriverVdsLFCenterMPlus "I/O监控模块，VDS保护";
+CM_ SG_ 1536 Cap_CollisionSignalStatus "I/O监控模块，PWM故障状态显示";
+CM_ SG_ 1536 Cap_CollisionSignalDuty "I/O监控模块，碰撞信号占空比";
+CM_ SG_ 1536 Cap_KL15FaultStatus "I/O监控模块，KL15电压异常显示";
+CM_ SG_ 1536 Cap_KL15Voltage "I/O监控模块，KL15电压";
+CM_ SG_ 1536 Cap_KL30FaultStatus "I/O监控模块，KL30电压异常显示";
+CM_ SG_ 1536 Cap_KL30Voltage "I/O监控模块，KL30电压";
+CM_ SG_ 1536 Cap_ChargeFault "模组告警故障模块，模组充电电压故障状态显示";
+CM_ SG_ 1536 Cap_ChargeVoltage "模组告警故障模块，模组充电电压显示";
+CM_ SG_ 1536 Cap_DisChargeFault "模组告警故障模块，模组放电故障状态显示";
+CM_ SG_ 1536 Cap_DisChargeCurrent "模组告警故障模块，模组放电电流显示";
+CM_ SG_ 1536 Cap_ImbalanceFault "模组告警故障模块，电压不均衡故障状态显示";
+CM_ SG_ 1536 Cap_OpenCircuitFault "模组告警故障模块，模组断路故障显示";
+CM_ SG_ 1536 Cap_InternalResistance "模组告警故障模块，模组内阻值显示";
+CM_ SG_ 1536 Cap_InternalResistanceStatus "模组告警故障模块，模组内阻值异常显示";
+CM_ SG_ 1536 Cap_ModuleCapacity "模组告警故障模块，模组容值显示";
+CM_ SG_ 1536 Cap_OverTempretureState "模组告警故障模块，模组温度过温显示";
+CM_ SG_ 1536 Cap_ModuleTempreture "模组告警故障模块，模组温度显示";
+CM_ SG_ 1536 Cap_MochainStatus "电容模组监控模块，电容模组充放电状态显示";
+CM_ SG_ 1536 Cap_ModuleCurrent "电容模组监控模块，电容模组电流监控";
+CM_ SG_ 1536 Cap_ModuleVoltage "电容模组监控模块，电容模组电压监控";
+CM_ SG_ 1536 Cap_ModulePower "电容模组监控模块，电容模组电量显示";
+CM_ SG_ 1536 Cap_Cell5ShortCircuitState "电容单体监控模块，电容短路显示";
+CM_ SG_ 1536 Cap_Cell4ShortCircuitState "电容单体监控模块，电容短路显示";
+CM_ SG_ 1536 Cap_Cell3ShortCircuitState "电容单体监控模块，电容短路显示";
+CM_ SG_ 1536 Cap_Cell2ShortCircuitState "电容单体监控模块，电容短路显示";
+CM_ SG_ 1536 Cap_Cell1ShortCircuitState "电容单体监控模块，电容短路显示";
+CM_ SG_ 1536 Cap_Cell5OverVoltageState "电容单体监控模块，电容过压显示";
+CM_ SG_ 1536 Cap_Cell4OverVoltageState "电容单体监控模块，电容过压显示";
+CM_ SG_ 1536 Cap_Cell3OverVoltageState "电容单体监控模块，电容过压显示";
+CM_ SG_ 1536 Cap_Cell2OverVoltageState "电容单体监控模块，电容过压显示";
+CM_ SG_ 1536 Cap_Cell1OverVoltageState "电容单体监控模块，电容过压显示";
+CM_ SG_ 1536 Cap_Cell5Vol "电容单体监控模块，电容电压显示";
+CM_ SG_ 1536 Cap_Cell4Vol "电容单体监控模块，电容电压显示";
+CM_ SG_ 1536 Cap_Cell3Vol "电容单体监控模块，电容电压显示";
+CM_ SG_ 1536 Cap_Cell2Vol "电容单体监控模块，电容电压显示";
+CM_ SG_ 1536 Cap_Cell1Vol "电容单体监控模块，电容电压显示";
+
+BA_DEF_ EV_  "GenEnvIsGeneratedDsp" ENUM  "No","Yes";
+BA_DEF_ EV_  "GenEnvAutoGenCtrl" ENUM  "No","Yes";
+BA_DEF_ EV_  "GenEnvMsgOffset" INT 0 2147483647;
+BA_DEF_ EV_  "GenEnvMsgName" STRING ;
+BA_DEF_ EV_  "GenEnvIsGeneratedSnd" ENUM  "No","Yes";
+BA_DEF_ SG_  "GenSigStartValue" FLOAT 0 1215752192;
+BA_DEF_ SG_  "GenSigTimeoutValue" FLOAT 0 1215752192;
+BA_DEF_ SG_  "GenSigInactiveValue" FLOAT 0 1215752192;
+BA_DEF_ SG_  "GenSigMinValue" INT 0 2147483647;
+BA_DEF_ SG_  "GenSigMaxValue" INT 0 2147483647;
+BA_DEF_ SG_  "GenSigSendType" ENUM "Cycle"; 
+BA_DEF_ SG_  "GenSigEnvVarType" ENUM  "int","float","undef";
+BA_DEF_ BO_  "CANFD_BRS" ENUM  "0","1";
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 0;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 0;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 0;
+BA_DEF_ BO_  "NmMessage" ENUM "No", "Yes"; 
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","StandardCAN_FD","ExtendedCAN_FD";
+BA_DEF_ BO_  "GenMsgSendType" ENUM "Cycle"; 
+BA_DEF_ BU_  "NmStationAddress"  HEX 0 127;
+BA_DEF_ BU_  "CANoeStartDelay" INT 0 0;
+BA_DEF_ BU_  "CANoeDrift" INT 0 0;
+BA_DEF_ BU_  "CANoeJitterMin" INT 0 0;
+BA_DEF_ BU_  "CANoeJitterMax" INT 0 0;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "GenEnvVarPrefix" STRING ;
+BA_DEF_  "GenEnvVarEndingSnd" STRING ;
+BA_DEF_  "GenEnvVarEndingDsp" STRING ;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_ BO_  "_Cdb_Sc_CTm_FAW_v3_0" INT 0 0;
+BA_DEF_ BO_  "_Cdb_Sc_CTm_FAW_v2_3" INT 0 0;
+BA_DEF_ BO_  "_Cdb_Sc_CTm_FAW_v3_1" INT 0 0;
+BA_DEF_ BO_  "_Cdb_Sc_CTm_FAW_v2_2" INT 0 0;
+BA_DEF_ BO_  "_Cdb_Sc_CTm_FAW_v2_1" INT 0 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "NmMessage" "No"; 
+BA_DEF_DEF_  "GenEnvIsGeneratedDsp" "No";
+BA_DEF_DEF_  "GenEnvAutoGenCtrl" "No";
+BA_DEF_DEF_  "GenEnvMsgOffset" 0;
+BA_DEF_DEF_  "GenEnvMsgName" "";
+BA_DEF_DEF_  "GenEnvIsGeneratedSnd" "No";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenSigTimeoutValue" 0;
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenSigMinValue" 0;
+BA_DEF_DEF_  "GenSigMaxValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "Cycle";
+BA_DEF_DEF_  "GenSigEnvVarType" "undef"; 
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgSendType" "Cycle";
+BA_DEF_DEF_  "CANoeStartDelay" 0;
+BA_DEF_DEF_  "CANoeDrift" 0;
+BA_DEF_DEF_  "CANoeJitterMin" 0;
+BA_DEF_DEF_  "CANoeJitterMax" 0;
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "BusType" "CAN FD"; 
+BA_DEF_DEF_  "GenEnvVarPrefix" "PE"; 
+BA_DEF_DEF_  "GenEnvVarEndingSnd" "_Ps"; 
+BA_DEF_DEF_  "GenEnvVarEndingDsp" "_Pd"; 
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "_Cdb_Sc_CTm_FAW_v3_0" 0;
+BA_DEF_DEF_  "_Cdb_Sc_CTm_FAW_v2_3" 0;
+BA_DEF_DEF_  "_Cdb_Sc_CTm_FAW_v3_1" 0;
+BA_DEF_DEF_  "_Cdb_Sc_CTm_FAW_v2_2" 0;
+BA_DEF_DEF_  "_Cdb_Sc_CTm_FAW_v2_1" 0;
+BA_DEF_DEF_  "VFrameFormat" "StandardCAN_FD";
+BA_DEF_DEF_  "CANFD_BRS" "1";
+
+BA_ "DBName" "CanMatrix";
+BA_ "GenMsgCycleTime" BO_ 1537 10; 
+BA_ "GenMsgCycleTime" BO_ 1536 10; 
+
+
+

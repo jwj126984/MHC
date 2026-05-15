@@ -1,0 +1,8 @@
+- [x] Checkpoint 1: FaultModel已扩展，包含完整信号值字典属性
+- [x] Checkpoint 2: FaultLogger支持动态列生成，每行写入完整故障帧
+- [x] Checkpoint 3: FaultManager能够传递完整信号上下文
+- [x] Checkpoint 4: MainViewModel正确传递信号值到故障记录
+- [x] Checkpoint 5: 故障日志Excel文件包含所有信号列（代码实现）
+- [x] Checkpoint 6: 每行记录包含完整的故障帧状态（代码实现）
+- [x] Checkpoint 7: 故障类型正确标记在记录中（代码实现）
+- [x] Checkpoint 8: 异步写入正常工作，不阻塞UI（代码实现）

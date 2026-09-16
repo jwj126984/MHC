@@ -1,0 +1,123 @@
+<Window x:Class="MHC.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="参数设置" Height="600" Width="560"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        MinHeight="520" MinWidth="700">
+    <Grid Margin="16,12,16,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="4,4,4,8">
+
+                <TextBlock Text="参数设置" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                <TextBlock Text="容值设置" FontSize="14" FontWeight="Bold" Margin="0,0,0,6"/>
+                <Grid Margin="14,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="容值最小值(F):" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" x:Name="CapacityMinInput" Margin="6,0,0,0" VerticalContentAlignment="Center" Height="28"/>
+                    <TextBlock Grid.Column="2" Text="允许的最小容值，默认: 5.0F" FontSize="11" Foreground="Gray" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+                <Grid Margin="14,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="容值最大值(F):" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" x:Name="CapacityMaxInput" Margin="6,0,0,0" VerticalContentAlignment="Center" Height="28"/>
+                    <TextBlock Grid.Column="2" Text="允许的最大容值，默认: 6.0F" FontSize="11" Foreground="Gray" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="均衡电压范围" FontSize="14" FontWeight="Bold" Margin="0,0,0,6"/>
+                <Grid Margin="14,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="均衡电压差(V):" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" x:Name="VoltageDiffInput" Margin="6,0,0,0" VerticalContentAlignment="Center" Height="28"/>
+                    <TextBlock Grid.Column="2" Text="单体间允许的最大电压差，默认: 0.12V" FontSize="11" Foreground="Gray" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="内阻门限" FontSize="14" FontWeight="Bold" Margin="0,0,0,6"/>
+                <Grid Margin="14,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="内阻门限(mΩ):" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" x:Name="ResistanceThresholdInput" Margin="6,0,0,0" VerticalContentAlignment="Center" Height="28"/>
+                    <TextBlock Grid.Column="2" Text="允许的最大内阻，超过视为异常，默认: 200mΩ" FontSize="11" Foreground="Gray" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="温度范围" FontSize="14" FontWeight="Bold" Margin="0,0,0,6"/>
+                <Grid Margin="14,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="过温阈值(°C):" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" x:Name="TemperatureThresholdInput" Margin="6,0,0,0" VerticalContentAlignment="Center" Height="28"/>
+                    <TextBlock Grid.Column="2" Text="允许的最高温度，超过视为过温，默认: 85°C" FontSize="11" Foreground="Gray" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="放电电流阈值" FontSize="14" FontWeight="Bold" Margin="0,0,0,6"/>
+                <Grid Margin="14,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="放电电流(mA):" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" x:Name="DischargeCurrentInput" Margin="6,0,0,0" VerticalContentAlignment="Center" Height="28"/>
+                    <TextBlock Grid.Column="2" Text="允许的最大放电电流（负值表示放电方向），默认: -10000mA" FontSize="11" Foreground="Gray" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="修改密码" FontSize="14" FontWeight="Bold" Margin="0,0,0,6"/>
+                <Grid Margin="14,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="新密码:" VerticalAlignment="Center"/>
+                    <DockPanel Grid.Column="1" x:Name="NewPasswordContainer" Margin="6,0,0,0" LastChildFill="True">
+                        <PasswordBox x:Name="NewPasswordInput" Height="28" VerticalContentAlignment="Center"
+                                     PasswordChanged="NewPasswordInput_PasswordChanged"/>
+                    </DockPanel>
+                    <Button Grid.Column="2" x:Name="ToggleNewPasswordVisibilityButton" Content="显示"
+                            Width="60" Height="28" Margin="8,0,0,0" VerticalAlignment="Center"
+                            Click="ToggleNewPasswordVisibilityButton_Click"/>
+                    <Button Grid.Column="3" x:Name="ChangePasswordButton" Content="修改密码"
+                            Width="90" Height="28" Margin="8,0,0,0" VerticalAlignment="Center"
+                            Click="ChangePasswordButton_Click"/>
+                </Grid>
+                <TextBlock x:Name="PasswordHintText" Text="提示：输入新密码后点击“修改密码”即可立即更新；也可点击“显示”查看输入内容。"
+                           FontSize="11" Foreground="Gray" TextWrapping="Wrap" Margin="14,0,0,8"/>
+
+                <TextBlock x:Name="MessageText" Text="" Foreground="Red" FontSize="12"
+                           TextWrapping="Wrap" Margin="14,4,0,8"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button x:Name="SaveButton" Content="保存参数" Width="100" Height="32" Margin="0,0,10,0" IsDefault="True" Click="SaveButton_Click"/>
+            <Button x:Name="CancelButton" Content="取消" Width="100" Height="32" Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

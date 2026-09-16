@@ -445,7 +445,16 @@ namespace MHC
             SetCycleCountButton.Click += (sender, e) => SetCycleCount();
             SetIntervalButton.Click += (sender, e) => SetDischargeToChargeInterval();
 
+            // 故障计数清零按钮
+            ClearFaultCountButton.Click += ClearFaultCount;
 
+            // 参数设置按钮
+         //   SettingsButton.Click += SettingsButton_Click;
+        }
+
+        private void ClearFaultCount(object sender, RoutedEventArgs e)
+        {
+            _mainViewModel.ClearFaultCount();
         }
 
         private void RefreshData(object? state)
@@ -551,10 +560,24 @@ namespace MHC
 
         private void CanWakeup()
         {
-            // CAN唤醒功能：发送ID:0x400, data:00 00 00 00 00 00 00 00
             if (_canCommunication != null)
             {
-                _canCommunication.SendCanWakeupMessage();
+                bool isRunning = _canCommunication.ToggleCanWakeup();
+                
+                if (isRunning)
+                {
+                    CanWakeupButton.Content = "停止唤醒";
+                    CanWakeupEllipse.Fill = Brushes.Green;
+                    CanWakeupStatus.Text = "运行中";
+                    CanWakeupStatus.Foreground = Brushes.Green;
+                }
+                else
+                {
+                    CanWakeupButton.Content = "CAN唤醒";
+                    CanWakeupEllipse.Fill = Brushes.Gray;
+                    CanWakeupStatus.Text = "无";
+                    CanWakeupStatus.Foreground = Brushes.Gray;
+                }
             }
         }
 
@@ -1027,6 +1050,23 @@ namespace MHC
             }
         }
 
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 把 MainViewModel 注入到 PasswordDialog，
+            // 校验逻辑在弹窗内部完成：成功关闭并打开设置窗，失败时弹窗保持打开。
+            var passwordDialog = new PasswordDialog(_mainViewModel);
+            passwordDialog.Owner = this;
+
+            bool? result = passwordDialog.ShowDialog();
+
+            if (result.HasValue && result.Value && passwordDialog.IsAuthenticated)
+            {
+                var settingsWindow = new SettingsWindow(_mainViewModel);
+                settingsWindow.Owner = this;
+                settingsWindow.ShowDialog();
+            }
+        }
+
         // CAN监控方法
         private void ClearCANFrames()
         {
@@ -1045,9 +1085,12 @@ namespace MHC
         
         // 用于批量更新的集合
         private System.Collections.Generic.List<CANFrame> _batchFrames = new System.Collections.Generic.List<CANFrame>();
-        private int _batchSize = 50; // 每批处理的报文数量
+        private int _batchSize = 100; // 每批处理的报文数量
         private readonly object _batchLock = new object();
         private bool _isUpdating = false;
+        private long _sentFrameCount64 = 0;
+        private long _receivedFrameCount64 = 0;
+        private long _errorFrameCount64 = 0;
         
         // 用于标记是否需要滚动
         private bool _needsScroll = false;
@@ -1282,14 +1325,14 @@ namespace MHC
             try
             {
                 // 在后台线程中处理CAN报文
-                // 增加计数
+                // 使用Interlocked增加计数，避免锁竞争
                 if (message.IsTransmit)
                 {
-                    _sentFrameCount++;
+                    Interlocked.Increment(ref _sentFrameCount64);
                 }
                 else
                 {
-                    _receivedFrameCount++;
+                    Interlocked.Increment(ref _receivedFrameCount64);
                 }
                 
                 // 创建新的CANFrame对象
@@ -1305,27 +1348,38 @@ namespace MHC
                     Status = "正常"
                 };
 
-                // 将报文写入CSV文件
+                // 将报文写入CSV文件（异步写入，不阻塞处理线程）
                 WriteCanFrameToCsv(canFrame);
 
                 // 将报文加入批量更新集合
+                bool needTrigger = false;
                 lock (_batchFrames)
                 {
                     _batchFrames.Add(canFrame);
+                    if (_batchFrames.Count >= _batchSize)
+                    {
+                        needTrigger = true;
+                    }
+                }
+                
+                // 在锁外触发UI更新，减少锁持有时间
+                if (needTrigger)
+                {
+                    TriggerUIUpdate();
                 }
             }
             catch (Exception ex)
             {
                 // 记录异常，确保线程不会崩溃
                 System.Diagnostics.Debug.WriteLine($"处理报文异常: {ex.Message}");
-                _errorFrameCount++;
+                Interlocked.Increment(ref _errorFrameCount64);
             }
         }
 
         private void UpdateUIInternal()
         {
             System.Collections.Generic.List<CANFrame> framesToAdd;
-            int currentSentCount, currentReceivedCount, currentErrorCount;
+            long currentSentCount, currentReceivedCount, currentErrorCount;
             int batchCount;
             
             // 锁定批量集合，获取需要更新的数据
@@ -1336,13 +1390,18 @@ namespace MHC
                     return;
                     
                 // 限制批量大小，避免一次性处理过多数据
-                int maxBatchSize = 100;
+                int maxBatchSize = 200;
                 int processCount = Math.Min(batchCount, maxBatchSize);
-                framesToAdd = new System.Collections.Generic.List<CANFrame>(_batchFrames.GetRange(0, processCount));
+                framesToAdd = new System.Collections.Generic.List<CANFrame>(processCount);
+                for (int i = 0; i < processCount; i++)
+                {
+                    framesToAdd.Add(_batchFrames[i]);
+                }
                 _batchFrames.RemoveRange(0, processCount);
-                currentSentCount = _sentFrameCount;
-                currentReceivedCount = _receivedFrameCount;
-                currentErrorCount = _errorFrameCount;
+                // 使用Interlocked读取计数器，避免线程安全问题
+                currentSentCount = Interlocked.Read(ref _sentFrameCount64);
+                currentReceivedCount = Interlocked.Read(ref _receivedFrameCount64);
+                currentErrorCount = Interlocked.Read(ref _errorFrameCount64);
             }
             
             if (framesToAdd.Count == 0)
@@ -1359,10 +1418,32 @@ namespace MHC
                 CANFrames.Add(frame);
             }
 
-            // 确保集合不超过1000条
-            while (CANFrames.Count > 1000)
+            // 确保集合不超过1000条，优化删除逻辑
+            int overflow = CANFrames.Count - 1000;
+            if (overflow > 0)
             {
-                CANFrames.RemoveAt(0);
+                // 当溢出数量较大时，使用高效的方式重建集合
+                if (overflow > 200)
+                {
+                    var newFrames = new List<CANFrame>();
+                    for (int i = overflow; i < CANFrames.Count; i++)
+                    {
+                        newFrames.Add(CANFrames[i]);
+                    }
+                    CANFrames.Clear();
+                    foreach (var frame in newFrames)
+                    {
+                        CANFrames.Add(frame);
+                    }
+                }
+                else
+                {
+                    // 少量溢出时逐个删除
+                    for (int i = 0; i < overflow; i++)
+                    {
+                        CANFrames.RemoveAt(0);
+                    }
+                }
             }
         }
 
@@ -1370,21 +1451,35 @@ namespace MHC
         private Dictionary<string, double> _signalValueBatch = new Dictionary<string, double>();
         private object _signalValueLock = new object();
         private DateTime _lastSignalUpdate = DateTime.Now;
+        private bool _signalUpdateScheduled = false;
 
         private void OnSignalValueUpdated(string signalKey, double value)
         {
             // 将信号值添加到批处理集合
+            bool needSchedule = false;
             lock (_signalValueLock)
             {
                 _signalValueBatch[signalKey] = value;
+                if (!_signalUpdateScheduled && _signalValueBatch.Count >= 50)
+                {
+                    needSchedule = true;
+                    _signalUpdateScheduled = true;
+                }
             }
 
-            // 每100ms或累积100个信号值时批量更新UI
-            DateTime now = DateTime.Now;
-            if (_signalValueBatch.Count >= 100 || (now - _lastSignalUpdate).TotalMilliseconds >= 100)
+            // 累积50个信号值时批量更新UI
+            if (needSchedule)
             {
-                ProcessSignalValueBatch();
+                ScheduleSignalValueBatch();
             }
+        }
+        
+        private void ScheduleSignalValueBatch()
+        {
+            // 使用低优先级调度，避免阻塞UI
+            Dispatcher.BeginInvoke(new Action(() => {
+                ProcessSignalValueBatch();
+            }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         private void ProcessSignalValueBatch()
@@ -1397,6 +1492,7 @@ namespace MHC
                 batch = new Dictionary<string, double>(_signalValueBatch);
                 _signalValueBatch.Clear();
                 _lastSignalUpdate = DateTime.Now;
+                _signalUpdateScheduled = false;
             }
 
             // 批量更新UI
@@ -1464,26 +1560,7 @@ namespace MHC
                                         SleepWakeStatus.Foreground = System.Windows.Media.Brushes.Green;
                                     }
                                     break;
-                                case "SuperCapController_Cap_ModuleTempreture":
-                                    if (kvp.Value > 85)
-                                    {
-                                        _mainViewModel.UpdateSignalValue("SuperCapController_Cap_OverTempretureState", 1);
-                                    }
-                                    else
-                                    {
-                                        _mainViewModel.UpdateSignalValue("SuperCapController_Cap_OverTempretureState", 0);
-                                    }
-                                    break;
-                                case "SuperCapController_Cap_InternalResistance":
-                                    if (kvp.Value < 5 || kvp.Value > 6)
-                                    {
-                                        _mainViewModel.UpdateSignalValue("SuperCapController_Cap_InternalResistanceStatus", 1);
-                                    }
-                                    else
-                                    {
-                                        _mainViewModel.UpdateSignalValue("SuperCapController_Cap_InternalResistanceStatus", 0);
-                                    }
-                                    break;
+                                
                             }
                 }
                 

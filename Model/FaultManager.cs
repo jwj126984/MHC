@@ -8,11 +8,15 @@ namespace MHC.Model
     {
         private FaultLogger _faultLogger;
         private Dictionary<string, bool> _faultStatuses;
+        private int _faultCount;
+
+        public int FaultCount => _faultCount;
 
         public FaultManager(string logDirectory = "Logs")
         {
             _faultLogger = new FaultLogger(logDirectory);
             _faultStatuses = new Dictionary<string, bool>();
+            _faultCount = 0;
         }
 
         public void RecordFault(string location, string type, string value = "", Dictionary<string, double> signalValues = null, Dictionary<string, string> faultSignals = null)
@@ -32,6 +36,7 @@ namespace MHC.Model
                 var fault = new FaultModel(DateTime.Now, location, type, value, signalValuesCopy, faultSignalsCopy);
                 Task.Run(() => _faultLogger.LogFault(fault));
                 _faultStatuses[faultKey] = true;
+                _faultCount++;
             }
         }
 
@@ -45,6 +50,7 @@ namespace MHC.Model
                 {
                     hasNewFault = true;
                     _faultStatuses[signalKey] = true;
+                    _faultCount++;
                 }
             }
 
@@ -60,6 +66,12 @@ namespace MHC.Model
             {
                 _faultStatuses[signalKey] = false;
             }
+        }
+
+        public void ClearFaultCount()
+        {
+            _faultStatuses.Clear();
+            _faultCount = 0;
         }
 
         public void RecordFaults(IEnumerable<(string location, string type, string value)> faults, Dictionary<string, double> signalValues = null, Dictionary<string, string> faultSignals = null)

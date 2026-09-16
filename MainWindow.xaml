@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MHC"
         mc:Ignorable="d"
-        Title="碰撞电源模块监控系统" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
+        Title="碰撞电源模块监控系统V1.07" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <local:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
         <local:BoolToStringConverter x:Key="BoolToStringConverter"/>
@@ -29,7 +29,21 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="监控区" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="监控区" FontSize="16" FontWeight="Bold"/>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="SettingsButton" Content="参数设置" Width="70" Height="25" Margin="10,0,10,0" Click="SettingsButton_Click"/>
+                            <Button x:Name="ClearFaultCountButton" Content="清零" Width="50" Height="25" Margin="0,0,10,0" Click="ClearFaultCount"/>
+                            <TextBlock Text="故障次数:" Margin="0,0,5,0" />
+                            <TextBlock Text="{Binding FaultCount}" FontSize="14" FontWeight="Bold" Foreground="Red" x:Name="FaultCountText"/>
+                            
+                        </StackPanel>
+                    </Grid>
 
                     <!-- 第一行：电容监控和SRS碰撞CAN信号监控 -->
                     <Grid Grid.Row="1">

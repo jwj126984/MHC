@@ -3,6 +3,9 @@ using System.Windows;
 using MHC.Model;
 using System;
 using System.Linq;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MHC.ViewModel
 {
@@ -17,8 +20,24 @@ namespace MHC.ViewModel
         public double OverTemperatureThreshold { get; set; } = 85.0;
         public double CapacityMinThreshold { get; set; } = 5.0;
         public double CapacityMaxThreshold { get; set; } = 6.0;
-        public double VoltageDiffThreshold { get; set; } = 0.1;
+        public double VoltageDiffThreshold { get; set; } = 0.12;
         public double DischargeCurrentThreshold { get; set; } = -10000.0;
+        public double InternalResistanceThreshold { get; set; } = 200.0;
+
+        private string _passwordHash;
+        private string _settingsFilePath;
+        private string _passwordFilePath;
+
+        private int _faultCount;
+        public int FaultCount
+        {
+            get { return _faultCount; }
+            set
+            {
+                _faultCount = value;
+                OnPropertyChanged("FaultCount");
+            }
+        }
 
         public Dictionary<string, double> SignalValues
         {
@@ -36,6 +55,131 @@ namespace MHC.ViewModel
             _faultManager = new FaultManager();
             InitializeSignalValues();
             InitializeDisplayMappings();
+            InitializeSettingsPaths();
+            LoadPassword();
+            LoadSettings();
+        }
+
+        private void InitializeSettingsPaths()
+        {
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string appFolder = Path.Combine(appDataPath, "MHC");
+            if (!Directory.Exists(appFolder))
+            {
+                Directory.CreateDirectory(appFolder);
+            }
+            _settingsFilePath = Path.Combine(appFolder, "settings.ini");
+            _passwordFilePath = Path.Combine(appFolder, "password.ini");
+        }
+
+        private string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        private void LoadPassword()
+        {
+            if (File.Exists(_passwordFilePath))
+            {
+                _passwordHash = File.ReadAllText(_passwordFilePath).Trim();
+            }
+            else
+            {
+                _passwordHash = HashPassword("admin");
+                File.WriteAllText(_passwordFilePath, _passwordHash);
+            }
+        }
+
+        public bool VerifyPassword(string password)
+        {
+            return HashPassword(password) == _passwordHash;
+        }
+
+        public void ChangePassword(string newPassword)
+        {
+            _passwordHash = HashPassword(newPassword);
+            File.WriteAllText(_passwordFilePath, _passwordHash);
+        }
+
+        public void SaveSettings()
+        {
+            var settings = new Dictionary<string, string>
+            {
+                { "OverTemperatureThreshold", OverTemperatureThreshold.ToString() },
+                { "CapacityMinThreshold", CapacityMinThreshold.ToString() },
+                { "CapacityMaxThreshold", CapacityMaxThreshold.ToString() },
+                { "VoltageDiffThreshold", VoltageDiffThreshold.ToString() },
+                { "DischargeCurrentThreshold", DischargeCurrentThreshold.ToString() },
+                { "InternalResistanceThreshold", InternalResistanceThreshold.ToString() }
+            };
+
+            using (var writer = new StreamWriter(_settingsFilePath))
+            {
+                foreach (var kvp in settings)
+                {
+                    writer.WriteLine($"{kvp.Key}={kvp.Value}");
+                }
+            }
+        }
+
+        private void LoadSettings()
+        {
+            if (File.Exists(_settingsFilePath))
+            {
+                var lines = File.ReadAllLines(_settingsFilePath);
+                foreach (var line in lines)
+                {
+                    var parts = line.Split('=');
+                    if (parts.Length == 2)
+                    {
+                        string key = parts[0].Trim();
+                        string value = parts[1].Trim();
+
+                        switch (key)
+                        {
+                            case "OverTemperatureThreshold":
+                                if (double.TryParse(value, out double temp))
+                                    OverTemperatureThreshold = temp;
+                                break;
+                            case "CapacityMinThreshold":
+                                if (double.TryParse(value, out double capMin))
+                                    CapacityMinThreshold = capMin;
+                                break;
+                            case "CapacityMaxThreshold":
+                                if (double.TryParse(value, out double capMax))
+                                    CapacityMaxThreshold = capMax;
+                                break;
+                            case "VoltageDiffThreshold":
+                                if (double.TryParse(value, out double voltDiff))
+                                    VoltageDiffThreshold = voltDiff;
+                                break;
+                            case "DischargeCurrentThreshold":
+                                if (double.TryParse(value, out double discharge))
+                                    DischargeCurrentThreshold = discharge;
+                                break;
+                            case "InternalResistanceThreshold":
+                                if (double.TryParse(value, out double resistance))
+                                    InternalResistanceThreshold = resistance;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ClearFaultCount()
+        {
+            _faultManager.ClearFaultCount();
+            FaultCount = 0;
         }
 
         private void InitializeDisplayMappings()
@@ -265,10 +409,11 @@ namespace MHC.ViewModel
             bool hasValidData = _signalValues.Any(kvp => kvp.Value != -1.0);
             if (!hasValidData) return;
 
-            CalculateOverTemperatureFault();
             CalculateCapacityFault();
+            CalculateInternalResistanceFault();
             CalculateImbalanceFault();
             CalculateDischargeFault();
+            CalculateOverTemperatureFault();
         }
 
         private void CalculateOverTemperatureFault()
@@ -285,8 +430,17 @@ namespace MHC.ViewModel
             double capacity = _signalValues.TryGetValue("SuperCapController_Cap_ModuleCapacity", out double cap) ? cap : -1.0;
             if (capacity == -1.0) return;
 
-            double capacityState = (capacity < CapacityMinThreshold || capacity > CapacityMaxThreshold) ? 1.0 : 0.0;
+            double capacityState = capacity < CapacityMinThreshold || capacity > CapacityMaxThreshold ? 1.0 : 0.0;
             UpdateSignalValueInternal("SuperCapController_Cap_ModuleCapacityState", capacityState);
+        }
+
+        private void CalculateInternalResistanceFault()
+        {
+            double resistance = _signalValues.TryGetValue("SuperCapController_Cap_InternalResistance", out double res) ? res : -1.0;
+            if (resistance == -1.0) return;
+
+            double resistanceState = resistance > InternalResistanceThreshold ? 1.0 : 0.0;
+            UpdateSignalValueInternal("SuperCapController_Cap_InternalResistanceStatus", resistanceState);
         }
 
         private void CalculateImbalanceFault()
@@ -550,6 +704,30 @@ namespace MHC.ViewModel
                         _faultManager.ClearFaultStatus(signalKey);
                     }
                 }
+                else if (signalKey.Contains("ModuleCapacityState"))
+                {
+                    if (value > 0)
+                    {
+                        allFaultSignalKeys.Add(signalKey);
+                        faultDescriptions[signalKey] = "容量故障";
+                    }
+                    else
+                    {
+                        _faultManager.ClearFaultStatus(signalKey);
+                    }
+                }
+                else if (signalKey.Contains("InternalResistanceStatus"))
+                {
+                    if (value > 0)
+                    {
+                        allFaultSignalKeys.Add(signalKey);
+                        faultDescriptions[signalKey] = "内阻异常";
+                    }
+                    else
+                    {
+                        _faultManager.ClearFaultStatus(signalKey);
+                    }
+                }
             }
 
             if (allFaultSignalKeys.Count > 0)
@@ -567,6 +745,7 @@ namespace MHC.ViewModel
                 }
 
                 _faultManager.RecordFaultWithDisplayNames(allFaultSignalKeys, logEntry);
+                FaultCount = _faultManager.FaultCount;
             }
         }
 

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using MHC;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using MHC;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -117,6 +117,10 @@ namespace MHC
         private const int ReceiveIntervalMs = 10;  // 接收间隔
         private const int ProcessIntervalMs = 10;  // 处理间隔
         private const int UIUpdateIntervalMs = 50;  // UI更新间隔
+        
+        private System.Threading.Timer? _wakeupTimer;
+        private bool _isWakeupRunning = false;
+        private const int WakeupIntervalMs = 10;  // CAN唤醒发送周期
         
         private string _softwareVersionBuffer = "";
         private string _hardwareVersionBuffer = "";
@@ -345,6 +349,8 @@ namespace MHC
                 _messageQueue.Clear();
                 _signalUpdateQueue.Clear();
 
+                StopCanWakeup();
+
                 return true;
             }
             catch (Exception ex)
@@ -498,6 +504,70 @@ namespace MHC
             {
                 OnError?.Invoke($"发送CAN唤醒报文异常: {ex.Message}");
                 return false;
+            }
+        }
+
+        public bool StartCanWakeup()
+        {
+            if (!_isStart)
+            {
+                OnError?.Invoke("CAN未启动");
+                return false;
+            }
+
+            if (_isWakeupRunning)
+            {
+                return false;
+            }
+
+            _isWakeupRunning = true;
+            _wakeupTimer = new System.Threading.Timer(WakeupCallback, null, 0, WakeupIntervalMs);
+            
+            return true;
+        }
+
+        public bool StopCanWakeup()
+        {
+            if (!_isWakeupRunning)
+            {
+                return false;
+            }
+
+            _isWakeupRunning = false;
+            _wakeupTimer?.Dispose();
+            _wakeupTimer = null;
+            
+            return true;
+        }
+
+        public bool ToggleCanWakeup()
+        {
+            if (_isWakeupRunning)
+            {
+                StopCanWakeup();
+                return false;
+            }
+            else
+            {
+                StartCanWakeup();
+                return true;
+            }
+        }
+
+        public bool IsWakeupRunning => _isWakeupRunning;
+
+        private void WakeupCallback(object? state)
+        {
+            try
+            {
+                if (_isWakeupRunning)
+                {
+                    SendCanWakeupMessage();
+                }
+            }
+            catch (Exception ex)
+            {
+                OnError?.Invoke($"CAN唤醒定时发送异常: {ex.Message}");
             }
         }
 
@@ -870,6 +940,10 @@ namespace MHC
             _signalUpdateQueue.Enqueue(new SignalUpdate { Name = "SuperCapController_Cap_ModuleTempreture", Value = ParseSignal(data, 136, 8, 1.0, 0.0, true) });
             _signalUpdateQueue.Enqueue(new SignalUpdate { Name = "SuperCapController_Cap_ModuleCapacity", Value = ParseSignal(data, 144, 8, 0.1, 0.0) });
             _signalUpdateQueue.Enqueue(new SignalUpdate { Name = "SuperCapController_Cap_InternalResistance", Value = ParseSignal(data, 160, 16, 1.0, 0.0) });
+
+            double overTemperatureState = ParseSignal(data, 171, 1, 1.0, 0.0);
+            _signalUpdateQueue.Enqueue(new SignalUpdate { Name = "SuperCapController_Cap_OverTempretureState", Value = overTemperatureState });
+            if (overTemperatureState > 0) OnFaultDetected?.Invoke("电容模组", "过热", "");
 
             double resistanceStatus = ParseSignal(data, 172, 1, 1.0, 0.0);
             _signalUpdateQueue.Enqueue(new SignalUpdate { Name = "SuperCapController_Cap_InternalResistanceStatus", Value = resistanceStatus });
